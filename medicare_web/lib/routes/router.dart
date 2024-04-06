@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicare_web/pages/error/no_internet_page.dart';
 import 'package:medicare_web/pages/landing_page.dart';
+import 'package:medicare_web/pages/new_patients_pages/final_page.dart';
 import 'package:medicare_web/pages/new_patients_pages/gen_ques_page.dart';
 import 'package:medicare_web/pages/new_patients_pages/personal_details.dart';
 import 'package:medicare_web/pages/new_patients_pages/symptoms_page.dart';
@@ -36,18 +37,23 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
         builder: (context) => const SymptomsPage(),
       );
+    case RoutesConstants.finalpageRoute:
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) => const FinalPage(),
+      );
     case RoutesConstants.genQuesRoute:
-      if (arguments is String) {
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (context) => GenQuesPage(question: arguments),
-        );
-      } else {
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (context) => UndefinitedPage(name: settings.name),
-        );
-      }
+      // if (arguments is String) {
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) => const GenQuesPage(),
+      );
+    // } else {
+    //   return MaterialPageRoute(
+    //     settings: settings,
+    //     builder: (context) => UndefinitedPage(name: settings.name),
+    //   );
+    // }
     default:
       return MaterialPageRoute(
         settings: settings,

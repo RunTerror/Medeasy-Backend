@@ -2,12 +2,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:medicare_web/constants/style/style_constants.dart';
-import 'package:medicare_web/models/message.dart';
+import 'package:medicare_web/constants/utils.dart';
+import 'package:medicare_web/providers/appwriteProvider.dart';
+import 'package:medicare_web/routes/routes_constants.dart';
+import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class GenQuesPage extends StatefulWidget {
-  final String question;
-  const GenQuesPage({super.key, required this.question});
+  const GenQuesPage({
+    super.key,
+  });
 
   @override
   State<GenQuesPage> createState() => _GenQuesPageState();
@@ -55,14 +59,23 @@ class _GenQuesPageState extends State<GenQuesPage> {
   final ScrollController _controller = ScrollController();
   testadd() {
     i++;
-    questionAnswer.add(Message(message: ques[i], by: 'medeasy'));
+    if (i <= ques.length - 1) {
+      questionAnswer.add(Message(message: ques[i], by: 'medeasy'));
+    } else {
+      questionAnswer
+          .add(Message(message: "No more questions left!", by: 'medeasy'));
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    ques = widget.question.split('\n');
-    questionAnswer.add(Message(message: ques[0], by: 'medeasy'));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final ap = Provider.of<AppwriteProvider>(context, listen: false);
+      ques = ap.questions;
+      questionAnswer.add(Message(message: ques[0], by: 'medeasy'));
+      setState(() {});
+    });
   }
 
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -294,6 +307,17 @@ class _GenQuesPageState extends State<GenQuesPage> {
                                         ),
                                       ),
                                     ),
+
+                                    // child: ListView.builder(
+                                    //   itemBuilder: (context, index) {
+                                    //     return Text(
+                                    //       ques.toString(),
+                                    //       style:
+                                    //           TextStyle(color: Colors.white),
+                                    //     );
+                                    //   },
+                                    //   itemCount: ques.length,
+                                    // )
                                   ),
                                   const Spacer(),
                                   InkWell(
@@ -339,20 +363,27 @@ class _GenQuesPageState extends State<GenQuesPage> {
                                   IconButton(
                                       onPressed: () async {
                                         if (_isListening == true) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  backgroundColor:
-                                                      StyleConstants.colorTitle,
-                                                  content: Text(
-                                                      'Please turn off the recording first')));
+                                          Utils().showSnackBar(context,
+                                              'Please turn off the recording first');
                                           return;
                                         }
-                                        // await Future.delayed(const Duration(seconds: 2), () {
                                         questionAnswer.add(Message(
                                             message: words, by: 'patient'));
+                                        setState(() {});
+                                        final ap =
+                                            Provider.of<AppwriteProvider>(
+                                                context,
+                                                listen: false);
+                                        ap.upDateHistory(
+                                            ap.questions.last, words);
+                                        final string = words;
                                         words = '';
-                                        log('words: $words');
-                                        testadd();
+                                        await ap.sendAudio(
+                                            string, ap.chatHistory);
+                                        ques = ap.questions;
+                                        questionAnswer.add(Message(
+                                            message: ques.last, by: 'medeasy'));
+                                        log('api question ${ap.questions.toString()}');
                                         setState(() {});
                                       },
                                       icon: const Icon(
@@ -370,7 +401,9 @@ class _GenQuesPageState extends State<GenQuesPage> {
             ),
           ),
           TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, RoutesConstants.finalpageRoute);
+              },
               child: const Text(
                 "NEXT",
                 style: TextStyle(
@@ -412,4 +445,11 @@ class _GenQuesPageState extends State<GenQuesPage> {
       ),
     );
   }
+}
+
+class Message {
+  final String message;
+  final String by;
+
+  Message({required this.message, required this.by});
 }

@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:medicare_web/constants/constants.dart';
 import 'package:medicare_web/models/patients.dart';
+import 'package:http/http.dart' as http;
 
 class AppwriteProvider extends ChangeNotifier {
   Client client = Client();
@@ -10,6 +14,9 @@ class AppwriteProvider extends ChangeNotifier {
   late Storage storage;
   late bool _isLoading;
   List<Patient>? _listItem;
+  List<String> questions = [];
+
+  Map<String, dynamic> chatHistory = {};
 
   bool get isLoading => _isLoading;
   List<Patient>? get listItem => _listItem;
@@ -38,6 +45,43 @@ class AppwriteProvider extends ChangeNotifier {
       await account.createAnonymousSession();
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  upDateHistory(String question, String answer) {
+    log(chatHistory.toString());
+    chatHistory[question] = answer;
+    log('chat history: ${chatHistory}');
+  }
+
+  Future<dynamic> sendAudio(String text, Map<String, dynamic> history) async {
+    log('calling');
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8000/initial_diagnose'),
+        headers: <String, String>{
+          'Content-Type': 'application/json', // Specify content-type header
+        },
+        body: jsonEncode({
+          "age": 0,
+          "heartbeat_rate": 0,
+          "complaint": text,
+          "metadata": "string",
+          "chat_history": history
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responsebody = jsonDecode(response.body);
+        log(responsebody.toString());
+        final question = responsebody['follow_question'];
+        questions.add(question);
+        return responsebody;
+      }
+      notifyListeners();
+      return null;
+    } catch (e) {
+      log(e.toString());
     }
   }
 

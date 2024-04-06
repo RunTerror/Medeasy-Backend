@@ -5,4 +5,5 @@ class RoutesConstants {
   static const String noInternetRoute = "/noInternet";
   static const String symptomsRoute = "/symptoms";
   static const String genQuesRoute = "/genQues";
+  static const String finalpageRoute = "/finalpage";
 }

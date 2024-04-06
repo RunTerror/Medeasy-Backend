@@ -22,18 +22,18 @@ class PersonalDetailsState extends State<PersonalDetailsPage> {
   String bloodPressure = '';
   Widget formField(
       {String? fieldText, String? regex, Function(String)? onChanged}) {
-    final String _fieldText = fieldText!;
-    final String _regex = regex!;
+    final String fieldText0 = fieldText!;
+    final String regex0 = regex!;
 
     return Column(children: [
       //SizedBox(height: _height * 0.05),
       TextFormField(
         decoration: InputDecoration(
-          labelText: _fieldText,
+          labelText: fieldText0,
         ),
         validator: (value) {
-          if (value!.isEmpty || !RegExp(_regex).hasMatch(value)) {
-            return "Invalid $_fieldText";
+          if (value!.isEmpty || !RegExp(regex0).hasMatch(value)) {
+            return "Invalid $fieldText0";
           }
           return null;
         },
