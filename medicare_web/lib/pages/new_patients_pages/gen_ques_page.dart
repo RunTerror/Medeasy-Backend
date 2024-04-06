@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:medicare_web/constants/style/style_constants.dart';
+import 'package:medicare_web/models/message.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:medicare_web/pages/new_patients_pages/bnsl.dart';
 
 class GenQuesPage extends StatefulWidget {
   final String question;
