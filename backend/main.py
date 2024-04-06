@@ -12,7 +12,6 @@ class PatientDetails(BaseModel):
     heartbeat_rate: int
     complaint: str
     metadata: str
-    complain: str
     chat_history: dict
 
 
@@ -54,7 +53,7 @@ async def run_diagnosis(patient_info: PatientDetails):
                                                             chat_history=patient_info.chat_history)
     return {'follow_question': follow_up_question}
 
-
+@app.post("/analyse_ecg")
 def analyse_ECG(self):
     """
     Diagnose ECG data using custom trained model
@@ -62,6 +61,7 @@ def analyse_ECG(self):
     :return:
         tuple: A tuple containing the predicted results and the test duration.
     """
+
 
 
 if __name__ == "__main__":
