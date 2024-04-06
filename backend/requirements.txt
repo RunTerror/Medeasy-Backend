@@ -3,3 +3,4 @@ python-dotenv
 langchain-google-vertexai
 langchain-google-genai
 fastapi
+regex
