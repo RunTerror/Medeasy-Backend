@@ -27,11 +27,34 @@ class Diagnoser:
 
         Question:
         """
+
+        ask_report_prompt = """
+        You are an expert chat doctor. Your task is to suggest the best diagnosing to the patient based on the complain and follow up questions.
+        Think step by step and mention the necessary requirements for diagnosing the patient including necessary support reports ECG Report, CT Scan, MRI Scan or blood test.
+        
+        Question: the input question you must answer
+        Thought: you should always think about what to do
+        Action: the action to take
+        Action Input: the input to the action
+        Observation: the result of the action
+        ... (this Thought/Action/Action Input/Observation can repeat N times)
+        Thought: I now know the final answer
+        Final Answer: the final answer to the original input question
+        
+        Begin!
+        
+        Patient Symptoms: {complain}
+        
+        Follow Up questions and answer from patient:
+        {chat_history}
+        """
         self.symptoms_template = PromptTemplate.from_template(diagnose_prompt)
         self.ask_patient = PromptTemplate.from_template(validation_prompt)
+        self.ask_reports = PromptTemplate.from_template(ask_report_prompt)
         self.llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY)
-        self.diganose_chain = LLMChain(llm=self.llm, prompt=self.symptoms_template, verbose=True)
+        self.diganose_chain = LLMChain(llm=self.llm, prompt=self.symptoms_template, verbose=False)
         self.ask_patient_chain = LLMChain(llm=self.llm, prompt=self.ask_patient, verbose=False)
+        self.doctor_agent = LLMChain(llm=self.llm, prompt=self.ask_reports, verbose=False)
 
     #
     def describe_symptoms(self, complaint):
@@ -51,6 +74,11 @@ class Diagnoser:
 
         return conversation_string
 
+    def ask_required_reports(self, complain, chathistory):
+        conversation_string = self._process_chathistory(chathistory)
+        assistance_response = self.doctor_agent.run(complain=complain, chat_history=conversation_string)
+        return assistance_response
+
 
 if __name__ == "__main__":
     diagnoser = Diagnoser()
@@ -59,9 +87,10 @@ if __name__ == "__main__":
     print(patient_symptoms)
     chat_history = {}
     for i in range(4):
-        follow_up_questions = diagnoser.ask_validation_questions(symptoms=patient_symptoms,chat_history=chat_history)
+        follow_up_questions = diagnoser.ask_validation_questions(symptoms=patient_symptoms, chat_history=chat_history)
         print(f"Doctor : {follow_up_questions}")
         patient_response = input("Patient: ")
         chat_history[follow_up_questions] = patient_response
 
-
+    final_response = diagnoser.ask_required_reports(patient_symptoms, chat_history)
+    print(final_response)
