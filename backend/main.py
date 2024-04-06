@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from model.sample_prediction import ECG
 from backend.doctor_agent import Diagnoser
 import uvicorn
+from backend.prestage_agent import ReportsAgent
 from dotenv import load_dotenv
 
 app = FastAPI()
@@ -53,17 +54,31 @@ async def upload_files(ecg_lr: UploadFile = File(...), ecg_hr: UploadFile = File
     except Exception as e:
         return {'message': str(e)}
 
-@app.post("/initial_diagnose")
+@app.post("/ask_questions")
 async def run_diagnosis(patient_info: PatientDetails):
+    """Agent generates validation question to help diagnosis process"""
     diagnoser = Diagnoser()
     follow_up_question = diagnoser.ask_validation_questions(symptoms=patient_info.complaint,
                                                             chat_history=patient_info.chat_history)
     return {'follow_question': follow_up_question}
 
-@app.post("/get_feedback")
-async def suggested_reports(patient_session: PatientSession):
+@app.post("/get_required_reports")
+async def get_requirements(patient_info: PatientDetails):
+    """Get the required reports and tests"""
+    report_agent = ReportsAgent.from_llm()
+    output = report_agent.run(conversation_history=patient_info.chat_history, patient_complain=patient_info.complaint)
+    return {'suggested_reports': output}
+
+@app.post("/final_diagnosis")
+async def final_diagnosis(patient_session: PatientSession):
+    """Get the final diagnosis"""
     diagnoser = Diagnoser()
-    required_reports = diagnoser.ask_required_reports(patient_session.symptoms, patient_session.chat_history)
+    chat_history = patient_session.chat_history
+    conversation_string = ""
+    for doctor_response, patient_response in chat_history.items():
+        conversation_string += f"Question: {doctor_response} \n Patient's Response: {patient_response}"
+
+    required_reports = diagnoser.run_final_diagnosis(patient_session.symptoms, patient_session.chat_history)
     return {'suggested_reports': required_reports}
 
 

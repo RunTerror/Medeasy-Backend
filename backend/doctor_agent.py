@@ -4,11 +4,17 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.agents import initialize_agent
+from backend.data_source import RAGAgent
 
 from dotenv import load_dotenv
 
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+
+data_agent = RAGAgent()
+
+
 
 
 class Diagnoser:
@@ -28,9 +34,11 @@ class Diagnoser:
         Question:
         """
 
-        ask_report_prompt = """
+        final_diagnose_prompt = """
         You are an expert chat doctor. Your task is to suggest the best diagnosing to the patient based on the complain and follow up questions.
-        Think step by step and mention the necessary requirements for diagnosing the patient including necessary support reports ECG Report, CT Scan, MRI Scan or blood test.
+        Do not suggest the steps to refer to doctor. Mention the diagnose and common medications for the same. You make take help from the following contexts to diagnose the disease.
+        
+        Context: {context}
         
         Question: the input question you must answer
         Thought: you should always think about what to do
@@ -50,14 +58,15 @@ class Diagnoser:
         """
         self.symptoms_template = PromptTemplate.from_template(diagnose_prompt)
         self.ask_patient = PromptTemplate.from_template(validation_prompt)
-        self.ask_reports = PromptTemplate.from_template(ask_report_prompt)
+        self.final_diagnose_template = PromptTemplate.from_template(final_diagnose_prompt)
         self.llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY)
         self.diganose_chain = LLMChain(llm=self.llm, prompt=self.symptoms_template, verbose=False)
         self.ask_patient_chain = LLMChain(llm=self.llm, prompt=self.ask_patient, verbose=False)
-        self.doctor_agent = LLMChain(llm=self.llm, prompt=self.ask_reports, verbose=False)
+        self.final_diagnosis = LLMChain(llm=self.llm, prompt=self.final_diagnose_template, verbose=False)
 
     #
     def describe_symptoms(self, complaint):
+        """Describe symptoms properly for diagnosis."""
         output = self.diganose_chain.run(patient_complain=complaint)
         return output
 
@@ -68,15 +77,17 @@ class Diagnoser:
 
     @staticmethod
     def _process_chathistory(chathistory):
+        """Preprocess the conversation json into string"""
         conversation_string = ""
         for doctor_response, patient_response in chathistory.items():
             conversation_string += f"Question: {doctor_response} \n Patient's Response: {patient_response}"
 
         return conversation_string
 
-    def ask_required_reports(self, complain, chathistory):
+    def run_final_diagnosis(self, complain, chathistory):
         conversation_string = self._process_chathistory(chathistory)
-        assistance_response = self.doctor_agent.run(complain=complain, chat_history=conversation_string)
+        data_chunks = data_agent.query_datasource("I am having continous vomit and wish to eat sour things")
+        assistance_response = self.final_diagnose_template.run(complain=complain, chat_history=conversation_string, context=data_chunks)
         return assistance_response
 
 
@@ -92,5 +103,5 @@ if __name__ == "__main__":
         patient_response = input("Patient: ")
         chat_history[follow_up_questions] = patient_response
 
-    final_response = diagnoser.ask_required_reports(patient_symptoms, chat_history)
+    final_response = diagnoser.final_diagnosis(patient_symptoms, chat_history)
     print(final_response)

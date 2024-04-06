@@ -12,11 +12,11 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY)
 
 
-class MedicalReports(LLMChain):
+class ReportsAgent(LLMChain):
     """Chain to analyze what information are required to diagno."""
 
     @classmethod
-    def from_llm(cls, llm: BaseLLM= llm, verbose: bool = True) -> LLMChain:
+    def from_llm(cls, llm: BaseLLM = llm, verbose: bool = True) -> LLMChain:
         """Get the response parser."""
         medical_report_agent_prompt = """You are a medical assistant who helps the doctor by recommending the test and reports required to assist the doctor. 
             Following '===' is the conversation history. 
@@ -47,8 +47,8 @@ class MedicalReports(LLMChain):
 
 
 if __name__ == "__main__":
-    stage_analyzer_chain = MedicalReports.from_llm()
-    output = stage_analyzer_chain.run(conversation_history='''{
+    report_agent = ReportsAgent.from_llm()
+    output = report_agent.run(conversation_history='''{
     "How long have you had this swelling?": "less than 4 hours",
     "How much time do you spend standing or walking during the day?": "Yes I feel pain while walking",
     "Do you have any pain or discomfort associated with the swelling?": "no only pale color and swelling"
