@@ -6,3 +6,6 @@ fastapi
 regex
 uvicorn
 python-multipart
+pandas
+tensorflow
+wfdb

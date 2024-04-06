@@ -123,7 +123,7 @@ class Resnet:
             monitor="loss", factor=0.5, patience=50, min_lr=0.0001
         )
 
-        file_path = self.output_directory + "best_model.h5"
+        file_path = self.output_directory + "best_model.hdf5"
 
         model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
             filepath=file_path, monitor="loss", save_best_only=True
@@ -153,13 +153,13 @@ class Resnet:
 
         duration = time.time() - start_time
 
-        self.model.save(self.output_directory + "last_model.h5")
+        self.model.save(self.output_directory + "last_model.hdf5")
 
         return f"Training Finished {duration}"
 
     def predict(self, x_test):
         start_time = time.time()
-        model_path = self.output_directory + "best_model.h5"
+        model_path = self.output_directory + "best_model.hdf5"
         model = tf.keras.models.load_model(model_path)
         y_pred = model.predict(x_test)
         test_duration = time.time() - start_time

@@ -1,8 +1,6 @@
 from model.data_preprocessing import load_raw_data
-import numpy as np
-from model.resnet import Resnet
 
-def analyze_ECG(file):
+def analyze_ECG():
     ecg_data = load_raw_data(file[0].name, 100, "")
     X = np.expand_dims(ecg_data, axis=0)
     output_dir = "time_series/model"
