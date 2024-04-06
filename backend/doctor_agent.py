@@ -87,7 +87,7 @@ class Diagnoser:
     def run_final_diagnosis(self, complain, chathistory):
         conversation_string = self._process_chathistory(chathistory)
         data_chunks = data_agent.query_datasource("I am having continous vomit and wish to eat sour things")
-        assistance_response = self.final_diagnose_template.run(complain=complain, chat_history=conversation_string, context=data_chunks)
+        assistance_response = self.final_diagnosis.run(complain=complain, chat_history=conversation_string, context=data_chunks)
         return assistance_response
 
 
