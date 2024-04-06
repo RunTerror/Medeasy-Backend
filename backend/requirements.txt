@@ -4,3 +4,5 @@ langchain-google-vertexai
 langchain-google-genai
 fastapi
 regex
+uvicorn
+python-multipart
