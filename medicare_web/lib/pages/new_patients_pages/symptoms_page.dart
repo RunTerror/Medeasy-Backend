@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medicare_web/constants/style/style_constants.dart';
 import 'package:medicare_web/providers/appwriteProvider.dart';
+import 'package:medicare_web/routes/router.dart';
+import 'package:medicare_web/routes/routes_constants.dart';
+import 'package:medicare_web/services/ai_model_service.dart';
 import 'package:provider/provider.dart';
 import 'package:gap/gap.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -15,7 +18,10 @@ class SymptomsPage extends StatefulWidget {
 
 class PersonalDetailsState extends State<SymptomsPage> {
   String? _selectedFilePath;
-
+  String? gem1Response;
+  String? gem2Response;
+  String? gem3Response;
+  bool isLoading = false;
   Future<void> _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -276,13 +282,13 @@ class PersonalDetailsState extends State<SymptomsPage> {
                           ),
                         ),
                         const Text(
-                          'Max file size 50 MB',
+                          'Max file size 50 MB    ',
                           style: TextStyle(
                               color: StyleConstants.colorTitle, fontSize: 14),
                         ),
                         const Gap(50),
                         const Text(
-                          'Add previous health records (if any)',
+                          'Add previous health records (if any)      ',
                           style: TextStyle(
                               color: StyleConstants.colorTitle, fontSize: 14),
                         ),
@@ -338,7 +344,7 @@ class PersonalDetailsState extends State<SymptomsPage> {
                           style: TextStyle(
                               color: StyleConstants.colorTitle, fontSize: 14),
                         ),
-                        const Gap(50),
+                        const Gap(10),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 600),
                           alignment: Alignment.center,
@@ -356,8 +362,12 @@ class PersonalDetailsState extends State<SymptomsPage> {
                                           width: 1, color: Colors.black)),
                                   child: const Icon(Icons.add),
                                 ),
-                                const Gap(5),
-                                const Text('Add more records (if any)')
+                                const Gap(10),
+                                const Text('Add more records (if any)',
+                                    style: TextStyle(
+                                        color: StyleConstants.colorTitle,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700))
                               ],
                             ),
                           ),
@@ -369,15 +379,38 @@ class PersonalDetailsState extends State<SymptomsPage> {
               ),
             ),
             TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "NEXT",
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: StyleConstants.colorTitle,
-                    fontWeight: FontWeight.w900,
-                  ),
-                )),
+                onPressed: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  gem1Response = await AIService().api(_inputText);
+                  if (gem1Response != null) {
+                    gem2Response = await AIService().findQuesApi(gem1Response!);
+                  }
+                  if (gem2Response != null) {
+                    gem3Response = await AIService().findQuesApi(gem2Response!);
+                  }
+                  if (gem3Response != null) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    Navigator.of(context).popAndPushNamed(
+                        RoutesConstants.genQuesRoute,
+                        arguments: gem3Response!);
+                  }
+                },
+                child: isLoading
+                    ? const CircularProgressIndicator(
+                        color: StyleConstants.colorTitle,
+                      )
+                    : const Text(
+                        "NEXT",
+                        style: TextStyle(
+                          fontSize: 28,
+                          color: StyleConstants.colorTitle,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      )),
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

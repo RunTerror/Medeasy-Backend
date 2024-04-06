@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicare_web/pages/error/no_internet_page.dart';
 import 'package:medicare_web/pages/landing_page.dart';
+import 'package:medicare_web/pages/new_patients_pages/gen_ques_page.dart';
 import 'package:medicare_web/pages/new_patients_pages/personal_details.dart';
 import 'package:medicare_web/pages/new_patients_pages/symptoms_page.dart';
 import 'package:medicare_web/pages/splash_page.dart';
@@ -8,6 +9,7 @@ import 'package:medicare_web/pages/undefinited_page.dart';
 import 'package:medicare_web/routes/routes_constants.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
+  final arguments = settings.arguments;
   switch (settings.name) {
     case RoutesConstants.splashScreenRoute:
       return MaterialPageRoute(
@@ -34,6 +36,18 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
         builder: (context) => const SymptomsPage(),
       );
+    case RoutesConstants.genQuesRoute:
+      if (arguments is String) {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => GenQuesPage(question: arguments),
+        );
+      } else {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => UndefinitedPage(name: settings.name),
+        );
+      }
     default:
       return MaterialPageRoute(
         settings: settings,
@@ -41,3 +55,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
   }
 }
+
+// class GenQuesPageArguments {
+//   final String question;
+
+//   GenQuesPageArguments(this.question);
+// }
