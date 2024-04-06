@@ -406,15 +406,15 @@ class PersonalDetailsState extends State<SymptomsPage> {
             ),
             TextButton(
                 onPressed: () async {
-                  // _inputText.trim().toString();
-                  // if (_inputText.isEmpty) {
-                  //   Utils()
-                  //       .showSnackBar(context, 'Please record a audio first');
-                  //   return;
-                  // }
-                  // setState(() {
-                  //   isLoading = true;
-                  // });
+                  _inputText.trim().toString();
+                  if (_inputText.isEmpty) {
+                    Utils()
+                        .showSnackBar(context, 'Please record a audio first');
+                    return;
+                  }
+                  setState(() {
+                    isLoading = true;
+                  });
                   // if (selectedFile != null) {
                   //   // here is the selected file in binary format for sending to api
                   //   final binary =
@@ -436,11 +436,13 @@ class PersonalDetailsState extends State<SymptomsPage> {
                   // try {} catch (e) {
                   //   log(e.toString());
                   // }
+
                   gem1Response = await AIService().api(_inputText);
                   log(gem1Response.toString());
                   if (gem1Response == null) return;
                   final response =
                       await provider.sendAudio(gem1Response!.toString(), {});
+                  provider.statement = gem1Response!.toString();
                   if (response != null) {
                     if (context.mounted) {
                       Navigator.of(context).pushNamed(

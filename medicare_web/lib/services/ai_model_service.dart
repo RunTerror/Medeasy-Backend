@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 const apiKey = 'AIzaSyCMnSa2M_K95X8T6lAjt0SHgl4PwiAhp_A';
@@ -47,5 +49,25 @@ $input''';
     final response = await model.generateContent(content);
     print("api3: ${response.text}");
     return response.text;
+  }
+
+  getSymptoms(Map<String, dynamic> questionAnswer, String statement) async {
+    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final prompt = '''
+You are a medical expert. You have been provided a patient's problems in sentences.
+Convert this sentences in proper english so that the doctor can diagnose the diseases properly.
+The output should be very specific to the original input sentence. I will give a map of question answer where question is key and answer is value. Also a statement that has some medical symptoms too so you have to take out the medical symptoms from them and give the list.
+
+here is the map: 
+$questionAnswer
+
+here is the statement: 
+$statement
+''';
+
+    final content = [Content.text(prompt)];
+    final response = await model.generateContent(content);
+    print("api3: ${response.text}");
+    log(response.text.toString());
   }
 }

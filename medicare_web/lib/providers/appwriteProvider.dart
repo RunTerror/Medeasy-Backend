@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:medicare_web/constants/constants.dart';
 import 'package:medicare_web/models/patients.dart';
 import 'package:http/http.dart' as http;
+import 'package:medicare_web/services/ai_model_service.dart';
 
 class AppwriteProvider extends ChangeNotifier {
   Client client = Client();
@@ -15,6 +16,14 @@ class AppwriteProvider extends ChangeNotifier {
   late bool _isLoading;
   List<Patient>? _listItem;
   List<String> questions = [];
+  List<String> symptoms = [];
+  String statement = '';
+
+  filterSymptoms() {
+    log('chat history: ${chatHistory.toString()}');
+    log('statement: $statement');
+    AIService().getSymptoms(chatHistory, statement);
+  }
 
   Map<String, dynamic> chatHistory = {};
 
@@ -52,6 +61,25 @@ class AppwriteProvider extends ChangeNotifier {
     log(chatHistory.toString());
     chatHistory[question] = answer;
     log('chat history: ${chatHistory}');
+  }
+
+  Future<dynamic> initializeDiagnose() async {
+    log(chatHistory.toString());
+    try {
+      final response = await http.post(
+          Uri.parse('http://localhost:8000/get_feedback'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body:
+              jsonEncode({"symptoms": "string", "chat_history": chatHistory}));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return null;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<dynamic> sendAudio(String text, Map<String, dynamic> history) async {

@@ -1,7 +1,10 @@
 import 'dart:async';
-
+import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:medicare_web/providers/appwriteProvider.dart';
+import 'package:provider/provider.dart';
 
 class FinalPage extends StatefulWidget {
   const FinalPage({
@@ -33,6 +36,16 @@ class FinalPageState extends State<FinalPage> {
   final String weight = 'weight';
   final String lastupdate = 'last update';
   final String contact = 'contact';
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final ap = Provider.of<AppwriteProvider>(context, listen: false);
+      ap.filterSymptoms();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
@@ -347,7 +360,14 @@ class FinalPageState extends State<FinalPage> {
                             ),
                             const Gap(10),
                             InkWell(
-                              onTap: () {
+                              onTap: () async {
+                                final ap = Provider.of<AppwriteProvider>(
+                                    context,
+                                    listen: false);
+                                final response = await ap.initializeDiagnose();
+                                log(response.toString());
+                                final suggestions =
+                                    response['suggested_reports'];
                                 setState(() {
                                   widgt = Container(
                                     padding: const EdgeInsets.symmetric(
@@ -357,9 +377,8 @@ class FinalPageState extends State<FinalPage> {
                                         color: color,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10))),
-                                    child: WordByWordAnimation(
-                                        text:
-                                            'athiasdf alkdaslfkda afdjlasdf  alfdalkdf l alfkdasdlf lafdlkadsf  alfdkladsf afld aldskflads falfdladfladsf asdlf laksdf adlf '),
+                                    child:
+                                        WordByWordAnimation(text: suggestions),
                                   );
                                 });
                               },

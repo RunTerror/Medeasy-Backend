@@ -262,11 +262,15 @@ class _GenQuesPageState extends State<GenQuesPage> {
                                                       )
                                                     : Container(),
                                                 const Gap(10),
-                                                Text(
-                                                  questionAnswer[index].message,
-                                                  style: const TextStyle(
+                                                Flexible(
+                                                  child: Text(
+                                                    questionAnswer[index]
+                                                        .message,
+                                                    style: const TextStyle(
                                                       color: Colors.white,
-                                                      fontSize: 20),
+                                                      fontSize: 20,
+                                                    ),
+                                                  ),
                                                 ),
                                                 const Gap(10),
                                                 questionAnswer[index].by ==
@@ -378,6 +382,18 @@ class _GenQuesPageState extends State<GenQuesPage> {
                                             ap.questions.last, words);
                                         final string = words;
                                         words = '';
+                                        if (ques.length == 4) {
+                                          questionAnswer.add(Message(
+                                              message:
+                                                  'Processing the diagnosis',
+                                              by: 'medeasy'));
+                                          Utils().showSnackBar(context,
+                                              'Processing the diagnosis');
+                                          setState(() {});
+                                          Navigator.pushNamed(context,
+                                              RoutesConstants.finalpageRoute);
+                                          return;
+                                        }
                                         await ap.sendAudio(
                                             string, ap.chatHistory);
                                         ques = ap.questions;
