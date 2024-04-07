@@ -13,7 +13,7 @@ class ECG:
         self.path = "knowledge_source"
         with open('model/labels.json', 'r') as f:
             labels = json.load(f)
-        self.labels = labels['labels']
+        self.labels = labels
 
     def predict(self, file_name, file_path, sampling_rate=100):
         ecg_data = load_raw_data(file_name, sampling_rate, file_path)
@@ -25,7 +25,8 @@ class ECG:
     def _postprocessing(self, predictions):
         masked_arr = (predictions > 0.5).astype(int)
         masked_arr = masked_arr[0]
-        result_list = [self.labels[i] for i in range(len(masked_arr)) if masked_arr[i] == 1]
+        labels_text = list(self.labels.values())
+        result_list = [labels_text[i] for i in range(len(masked_arr)) if masked_arr[i] == 1]
         return result_list
 
 
