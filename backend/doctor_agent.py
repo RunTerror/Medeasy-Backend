@@ -37,6 +37,7 @@ class Diagnoser:
         final_diagnose_prompt = """
         You are an expert chat doctor. Your task is to suggest the best diagnosing to the patient based on the complain and follow up questions.
         Do not suggest the steps to refer to doctor. Mention the diagnose and common medications for the same. You make take help from the following contexts to diagnose the disease.
+        Only Return the Final Response. Do not return the intermediate results.
         
         Context: {context}
         
@@ -86,7 +87,7 @@ class Diagnoser:
 
     def run_final_diagnosis(self, complain, chathistory):
         conversation_string = self._process_chathistory(chathistory)
-        data_chunks = data_agent.query_datasource("I am having continous vomit and wish to eat sour things")
+        data_chunks = data_agent.query_datasource(complain)
         assistance_response = self.final_diagnosis.run(complain=complain, chat_history=conversation_string, context=data_chunks)
         return assistance_response
 
