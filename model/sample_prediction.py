@@ -10,7 +10,7 @@ sampling_rate = 100
 class ECG:
     def __init__(self, model_path="model/model/best_model.hdf5"):
         self.ecg_model = tf.keras.models.load_model(model_path)
-        self.path = "tmp"
+        self.path = "knowledge_source"
         with open('model/labels.json', 'r') as f:
             labels = json.load(f)
         self.labels = labels['labels']

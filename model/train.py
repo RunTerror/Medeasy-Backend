@@ -36,7 +36,7 @@ def read_data():
     return X_train, X_test, y_train, y_test, mlb.classes_
 
 
-def main(output_directory: str = "time_series/model/"):
+def main(output_directory: str = "model/"):
     """
     Main function to train the ResNet model on ECG data.
 

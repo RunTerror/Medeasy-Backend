@@ -14,7 +14,7 @@ class RAGAgent:
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY)
         self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key = GOOGLE_API_KEY)
-        self.db_path = "tmp/vector_db"
+        self.db_path = "knowledge_source/vector_db"
         try:
             self.vector_db = FAISS.load_local(self.db_path, self.embeddings, allow_dangerous_deserialization=True)
         except Exception as e:

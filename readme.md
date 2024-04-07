@@ -11,9 +11,9 @@ MEDEASY is a web application designed to assist doctors in recording patient dat
 
 MEDEASY provides a user-friendly interface for doctors to streamline their workflow and enhance patient care. It allows doctors to efficiently record patient data, including medical history, symptoms, and treatment plans, and store them securely in the system. Additionally, doctors can use MEDEASY to record audio notes during patient consultations, which are automatically transcribed and added to the patient's medical record.
 
-One of the key features of MEDEASY is its diagnosis generation functionality. Based on the recorded patient data and audio notes, MEDEASY utilizes advanced algorithms and medical knowledge databases to suggest potential diagnoses for the patient's condition. Doctors can review and verify these diagnoses, ensuring accuracy and reliability in patient care.
+One of the key features of MEDEASY is its diagnosis generation functionality. Based on the recorded patient data and audio notes, MEDEASY utilizes mutli AI Agent framework incorporated with credible and acknowledged medical knowledge databases to suggest potential diagnoses for the patient's condition. Doctors can review and verify these diagnoses, ensuring accuracy and reliability in patient care.
 
-Welcome to our project! This guide will help you set up your development environment and get started with our Flutter web app, which uses Appwrite for backend services, a custom multilabel classification model, and FastAPI for endpoints.
+Welcome to our project! This guide will help you set up your development environment and get started with our Flutter web app, which uses Appwrite for backend services, a custom multilabel classification model, and FastAPI for hosting multi AI agent framework.
 
 ## Prerequisites
 
@@ -23,27 +23,46 @@ Before you begin, ensure you have the following installed:
 - Chrome: Required for debugging the web app.
 - An IDE that supports Flutter, such as Visual Studio Code, Android Studio, or IntelliJ IDEA. Install the Flutter and Dart plugins for your IDE.
 
-## Setting Up the Flutter Web App
+### Setting Up the Flutter Web App
 
 1. **Create a New Flutter Project**: Open your terminal or command prompt and run the following command to create a new Flutter project with web support:
-2. ```bash:
+    ```bash:
+   git clone https://github.com/Photon3009/Medeasy.git
    flutter create my_project
-3. **Navigate into your project directory**:
+2. **Navigate into your project directory**:
    ```bash:
    cd my_project
-4. **Add Web Support**: To enable web support, run:
+3. **Add Web Support**: To enable web support, run:
       ```bash:
    flutter config --enable-web
-5. **Get the web dependencies**:
+4. **Get the web dependencies**:
        ```bash:
     flutter pub get
    
-6. **Integrate Appwrite**: Open `lib/main.dart` and replace `<YOUR_PROJECT_ID>` with your actual Appwrite project ID
+5. **Integrate Appwrite**: Open `lib/main.dart` and replace `<YOUR_PROJECT_ID>` with your actual Appwrite project ID
 
-7. **Run Your Project**: To run your project, use the following command:
+6. **Run Your Project**: To run your project, use the following command:
 
-       ```bash:
-    flutter run -d chrome
+       flutter run -d chrome
+### Setting up the FastAPI Backend 
+1. Clone the repository
+   
+    `git clone https://github.com/Photon3009/Medeasy.git`
+2. Enter the repository
+     
+    `cd Medeasy`
+   
+3. Install the requirements
+
+    `pip install -r backend/requirements.txt`
+4. Run the server 
+    
+    `python -m backend/main`
+
+## Training 
+- For training the CNN architecture for Multilabel data classification (ECG). 
+  - Download the data from the website [Kaggle](https://www.kaggle.com/datasets/khyeh0719/ptb-xl-dataset) and place it in ```model/data/```
+  - Run ```python model/train.py```
 
 ## Features
 
